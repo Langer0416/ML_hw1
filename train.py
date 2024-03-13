@@ -1,17 +1,21 @@
 import time, torch
+from tqdm import tqdm
 
 best_acc = 0
 elapsedTime = 0
 Resnet50_weight_path = "./weight/Resnet50.pth"
 def train(epoch, Model, device, train_loader, valid_loader, optimizer, criterion, Target_epoch):
     global best_acc
-    print("Epoch : {}/{}".format(epoch, Target_epoch))
+    # print("Epoch : {}/{}".format(epoch, Target_epoch))
     print("-" * 15)
     Model.train()
     train_loss = 0
     correct = 0
     total = 0
     start_time = time.time()
+
+    loop_train = tqdm((train_loader), total=len(train_loader))
+
     for batch_idx, (inputs, targets) in enumerate(train_loader):
         inputs, targets = inputs.to(device), targets.to(device)
         optimizer.zero_grad()
@@ -25,15 +29,11 @@ def train(epoch, Model, device, train_loader, valid_loader, optimizer, criterion
         total += targets.size(0)
         correct += predicted.eq(targets).sum().item()
 
-        Progressbar.progress_bar(batch_idx, len(train_loader), 'Loss: %.3f | Acc: %.3f%% (%d/%d)'
-                                 % (train_loss / (batch_idx + 1), 100. * correct / total, correct, total))
+        loop_train.set_description("Epoch [{}/{}]".format(epoch, Target_epoch))
+        loop_train.set_postfix(loss=loss.item(), acc=100. * correct / total)
 
     avg_train_loss = train_loss / len(train_loader.dataset)
     accuracy = 100. * correct / total
-
-    # 在TensorBoard中記錄訓練損失和準確度
-    # writer.add_scalar('Train/Loss', avg_train_loss, epoch)
-    # writer.add_scalar('Train/Accuracy', accuracy, epoch)
 
     ## Validation
     Model.eval()
@@ -42,6 +42,9 @@ def train(epoch, Model, device, train_loader, valid_loader, optimizer, criterion
     total_valid = 0
 
     with torch.no_grad():
+
+        loop_valid = tqdm((valid_loader), total=len(valid_loader))
+
         for batch_idx, (inputs_valid, targets_valid) in enumerate(valid_loader):
             inputs_valid, targets_valid = inputs_valid.to(device), targets_valid.to(device)
             outputs_valid = Model(inputs_valid)
@@ -52,8 +55,8 @@ def train(epoch, Model, device, train_loader, valid_loader, optimizer, criterion
             total_valid += targets_valid.size(0)
             correct_valid += predicted_valid.eq(targets_valid).sum().item()
 
-            Progressbar.progress_bar(batch_idx, len(valid_loader), 'Loss: %.3f | Acc: %.3f%% (%d/%d)'
-                                     % (valid_loss / (batch_idx + 1), 100. * correct_valid / total_valid, correct_valid, total_valid))
+            loop_valid.set_description("Validation")
+            loop_valid.set_postfix(loss=loss_valid.item(), acc=100. * correct_valid / total_valid)
 
     print("Elapsed time is {:.3f}".format(time.time() - start_time))
 
