@@ -50,15 +50,11 @@ def train(epoch, Model, device, train_loader, valid_loader, optimizer, criterion
             total_valid += targets_valid.size(0)
             correct_valid += predicted_valid.eq(targets_valid).sum().item()
 
-
-    # print("Elapsed time is {:.3f}".format(time.time() - start_time))
-
     avg_valid_loss = valid_loss / len(valid_loader.dataset)
     accuracy_valid = 100. * correct_valid / total_valid
 
     if accuracy_valid > best_acc:
         best_acc = accuracy_valid
         torch.save(Model.state_dict(), Resnet50_weight_path)
-        # print("  Save Model, Best_acc is {:.3f}".format(best_acc))
 
     return avg_train_loss, accuracy, avg_valid_loss, accuracy_valid

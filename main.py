@@ -9,7 +9,6 @@ from torch.utils.data import Subset
 import train, model
 from torch.utils.data import DataLoader
 from matplotlib import pyplot as plt
-from tqdm import tqdm
 
 def train_val_dataset(dataset, val_split=0.2):
     train_idx, val_idx = train_test_split(list(range(len(dataset))), test_size=val_split)
@@ -36,15 +35,9 @@ if __name__ == '__main__':
     train_dataset = ImageFolder(root='./train', transform=transform)
 
     datasets = train_val_dataset(train_dataset)
-    # print(len(datasets['train']))
-    # print(len(datasets['val']))
 
     train_loader = DataLoader(datasets['train'], batch_size=32, shuffle=True, num_workers=0)
     valid_loader = DataLoader(datasets['val'], batch_size=32, shuffle=True, num_workers=0)
-
-
-    # print(train_dataset.class_to_idx)
-    # print(train_dataset.classes) #emotion name
 
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     print("Device is :{}".format(device))

@@ -9,6 +9,6 @@
 ![Accuracy.png](PIC%2FAccuracy.png)
 ----
 
-## 3.Prdict Result
+## 3.Predict Result
 
 ![predict.png](PIC%2Fpredict.png)
