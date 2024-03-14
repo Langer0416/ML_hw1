@@ -10,3 +10,5 @@
 ----
 
 ## 3.Prdict Result
+
+![predict.png](PIC%2Fpredict.png)
